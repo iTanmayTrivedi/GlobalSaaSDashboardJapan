@@ -10,7 +10,7 @@ export type Database = {
   // Allows to automatically instantiate createClient with right options
   // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
   __InternalSupabase: {
-    PostgrestVersion: "14.5"
+    PostgrestVersion: "14.1"
   }
   public: {
     Tables: {
@@ -160,10 +160,15 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      create_org_with_member: {
-        Args: { _name: string; _role?: Database["public"]["Enums"]["app_role"] }
-        Returns: string
-      }
+      create_org_with_member:
+        | { Args: { _name: string }; Returns: string }
+        | {
+            Args: {
+              _name: string
+              _role?: Database["public"]["Enums"]["app_role"]
+            }
+            Returns: string
+          }
       has_org_role: {
         Args: {
           _org_id: string
