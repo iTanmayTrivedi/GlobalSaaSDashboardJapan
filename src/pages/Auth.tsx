@@ -14,7 +14,7 @@ import { handleApiError } from '@/lib/api-error';
 import { checkRateLimit } from '@/lib/rate-limit';
 import { MOCK_USERS } from '@/lib/mock-auth';
 import AuthShowcase from '@/components/auth/AuthShowcase';
-import { lovable } from '@/integrations/lovable';
+import { supabase } from '@/integrations/supabase/client';
 
 const Auth = () => {
   const { isAuthenticated, loading, signIn, signUp, mockSignIn, authMode, setAuthMode, supabaseAvailable } = useAuth();
@@ -84,14 +84,15 @@ const Auth = () => {
   const handleGoogleSignIn = async () => {
     setSubmitting(true);
     try {
-      const result = await lovable.auth.signInWithOAuth('google', {
-        redirect_uri: window.location.origin,
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: 'google',
+        options: { redirectTo: window.location.origin },
       });
-      if (result.error) {
-        handleApiError(result.error);
+      if (error) {
+        handleApiError(error);
         setSubmitting(false);
       }
-      // If redirected, browser navigates away.
+      // On success the browser is redirected to Google.
     } catch (err) {
       handleApiError(err);
       setSubmitting(false);
