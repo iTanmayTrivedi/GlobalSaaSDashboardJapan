@@ -56,7 +56,7 @@ const Auth = () => {
         return;
       }
     } else {
-      const result = signUpSchema.safeParse({ email, password, displayName, selectedRole });
+      const result = signUpSchema.safeParse({ email, password, confirmPassword, displayName, selectedRole });
       if (!result.success) {
         const errors: Record<string, string> = {};
         result.error.issues.forEach(issue => { errors[issue.path[0] as string] = issue.message; });
