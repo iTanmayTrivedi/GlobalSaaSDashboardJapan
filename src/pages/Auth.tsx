@@ -25,6 +25,7 @@ const Auth = () => {
   const [displayName, setDisplayName] = useState('');
   const [selectedRole, setSelectedRole] = useState<AppRole>('member');
   const [submitting, setSubmitting] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
 
   if (loading) {
