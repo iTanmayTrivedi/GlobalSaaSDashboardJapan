@@ -73,7 +73,7 @@ const Auth = () => {
       } else {
         const { error } = await signUp(email, password, displayName, selectedRole);
         if (error) handleApiError(error);
-        else toast.success(t('checkEmail'));
+        else toast.success(t('signup'));
       }
     } catch (err) {
       handleApiError(err);
