@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap');
+/* Apple-like system font stack — no external font needed */
 
 @tailwind base;
 @tailwind components;
@@ -50,8 +50,8 @@
     --warning: 38 92% 50%;
     --warning-foreground: 0 0% 100%;
 
-    --font-heading: 'Space Grotesk', sans-serif;
-    --font-body: 'Inter', sans-serif;
+    --font-heading: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', system-ui, sans-serif;
+    --font-body: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Segoe UI', system-ui, sans-serif;
   }
 
   .dark {
@@ -107,9 +107,13 @@
   body {
     @apply bg-background text-foreground;
     font-family: var(--font-body);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    letter-spacing: -0.011em;
   }
 
   h1, h2, h3, h4, h5, h6 {
     font-family: var(--font-heading);
+    letter-spacing: -0.022em;
   }
 }

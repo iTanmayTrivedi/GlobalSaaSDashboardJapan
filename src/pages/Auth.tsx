@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Globe, Loader2, AlertTriangle, Monitor, Cloud, ArrowRight } from 'lucide-react';
+import { Globe, Loader2, AlertTriangle, Monitor, Cloud, ArrowRight, Eye, EyeOff } from 'lucide-react';
 import { toast } from 'sonner';
 import { AppRole } from '@/contexts/OrgContext';
 import { signInSchema, signUpSchema } from '@/lib/validations';
@@ -25,6 +25,7 @@ const Auth = () => {
   const [displayName, setDisplayName] = useState('');
   const [selectedRole, setSelectedRole] = useState<AppRole>('member');
   const [submitting, setSubmitting] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
 
   if (loading) {
@@ -72,7 +73,7 @@ const Auth = () => {
       } else {
         const { error } = await signUp(email, password, displayName, selectedRole);
         if (error) handleApiError(error);
-        else toast.success(t('checkEmail'));
+        else toast.success(t('signup'));
       }
     } catch (err) {
       handleApiError(err);
@@ -225,7 +226,17 @@ const Auth = () => {
                 </div>
                 <div className="space-y-1.5">
                   <Label htmlFor="password" className="text-xs font-medium text-muted-foreground">{t('password')}</Label>
-                  <Input id="password" type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="••••••••" required minLength={6} className="h-11 rounded-xl border-border/60 bg-card focus:border-primary" />
+                  <div className="relative">
+                    <Input id="password" type={showPassword ? 'text' : 'password'} value={password} onChange={(e) => setPassword(e.target.value)} placeholder="••••••••" required minLength={6} className="h-11 rounded-xl border-border/60 bg-card focus:border-primary pr-10" />
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword((s) => !s)}
+                      aria-label={showPassword ? 'Hide password' : 'Show password'}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+                    >
+                      {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                    </button>
+                  </div>
                   {fieldErrors.password && <p className="text-xs text-destructive">{fieldErrors.password}</p>}
                 </div>
                 <Button type="submit" className="w-full h-11 rounded-xl font-medium text-sm" disabled={submitting}>
