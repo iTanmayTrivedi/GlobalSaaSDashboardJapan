@@ -228,7 +228,7 @@ const Auth = () => {
                 <div className="space-y-1.5">
                   <Label htmlFor="password" className="text-xs font-medium text-muted-foreground">{t('password')}</Label>
                   <div className="relative">
-                    <Input id="password" type={showPassword ? 'text' : 'password'} value={password} onChange={(e) => setPassword(e.target.value)} placeholder="••••••••" required minLength={6} className="h-11 rounded-xl border-border/60 bg-card focus:border-primary pr-10" />
+                    <Input id="password" type={showPassword ? 'text' : 'password'} value={password} onChange={(e) => setPassword(e.target.value)} placeholder="••••••••" required minLength={isLogin ? 6 : 8} className="h-11 rounded-xl border-border/60 bg-card focus:border-primary pr-10" />
                     <button
                       type="button"
                       onClick={() => setShowPassword((s) => !s)}
@@ -239,7 +239,31 @@ const Auth = () => {
                     </button>
                   </div>
                   {fieldErrors.password && <p className="text-xs text-destructive">{fieldErrors.password}</p>}
+                  {!isLogin && password.length > 0 && (
+                    <ul className="grid grid-cols-2 gap-x-3 gap-y-1 pt-1">
+                      {[
+                        { ok: password.length >= 8, label: '8+ characters' },
+                        { ok: /[A-Z]/.test(password), label: 'Uppercase' },
+                        { ok: /[a-z]/.test(password), label: 'Lowercase' },
+                        { ok: /[0-9]/.test(password), label: 'Number' },
+                      ].map((r) => (
+                        <li key={r.label} className={`flex items-center gap-1.5 text-[11px] ${r.ok ? 'text-success' : 'text-muted-foreground'}`}>
+                          {r.ok ? <Check className="h-3 w-3" /> : <X className="h-3 w-3" />}
+                          {r.label}
+                        </li>
+                      ))}
+                    </ul>
+                  )}
                 </div>
+                {!isLogin && (
+                  <div className="space-y-1.5">
+                    <Label htmlFor="confirmPassword" className="text-xs font-medium text-muted-foreground">Confirm password</Label>
+                    <div className="relative">
+                      <Input id="confirmPassword" type={showPassword ? 'text' : 'password'} value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} placeholder="••••••••" required className="h-11 rounded-xl border-border/60 bg-card focus:border-primary pr-10" />
+                    </div>
+                    {fieldErrors.confirmPassword && <p className="text-xs text-destructive">{fieldErrors.confirmPassword}</p>}
+                  </div>
+                )}
                 <Button type="submit" className="w-full h-11 rounded-xl font-medium text-sm" disabled={submitting}>
                   {submitting ? <><Loader2 className="mr-2 h-4 w-4 animate-spin" />{isLogin ? t('login') : t('signup')}</> : (
                     <span className="flex items-center gap-2">
