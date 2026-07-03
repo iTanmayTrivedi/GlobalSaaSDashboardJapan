@@ -311,7 +311,7 @@ const Auth = () => {
                 )}
                 <div className="text-xs">
                   {isLogin ? t('noAccount') : t('hasAccount')}{' '}
-                  <button onClick={() => { setIsLogin(!isLogin); setFieldErrors({}); }} className="font-medium text-primary hover:underline">
+                  <button onClick={() => { setIsLogin(!isLogin); setFieldErrors({}); setConfirmPassword(''); }} className="font-medium text-primary hover:underline">
                     {isLogin ? t('signup') : t('login')}
                   </button>
                 </div>
