@@ -13,8 +13,8 @@ serve(async (req) => {
 
   try {
     const { messages, language } = await req.json();
-    const GEMINI_API_KEY = Deno.env.get("GEMINI_API_KEY");
-    if (!GEMINI_API_KEY) throw new Error("GEMINI_API_KEY is not configured");
+    const GROQ_API_KEY = Deno.env.get("GROQ_API_KEY");
+    if (!GROQ_API_KEY) throw new Error("GROQ_API_KEY is not configured");
 
     const systemPrompt = language === 'ja'
       ? `あなたは日本のビジネス環境に精通した優秀なAIアシスタントです。ユーザーが日本語で質問した場合は日本語で回答してください。英語で質問された場合は英語で回答してください。
