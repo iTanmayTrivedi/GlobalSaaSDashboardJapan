@@ -146,14 +146,14 @@ ${resumeLang === 'ja' ? `
         throw new Error(`Unknown action: ${action}`);
     }
 
-    const response = await fetch(GEMINI_ENDPOINT, {
+    const response = await fetch(GROQ_ENDPOINT, {
       method: "POST",
       headers: {
-        Authorization: `Bearer ${GEMINI_API_KEY}`,
+        Authorization: `Bearer ${GROQ_API_KEY}`,
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        model: GEMINI_MODEL,
+        model: GROQ_MODEL,
         messages: [
           { role: "system", content: systemPrompt },
           { role: "user", content: userPrompt },
