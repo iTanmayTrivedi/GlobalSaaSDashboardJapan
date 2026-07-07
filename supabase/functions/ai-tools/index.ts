@@ -168,8 +168,8 @@ ${resumeLang === 'ja' ? `
         });
       }
       const t = await response.text();
-      console.error("Gemini error:", response.status, t);
-      return new Response(JSON.stringify({ error: `Gemini error (${response.status})` }), {
+      console.error("Groq error:", response.status, t);
+      return new Response(JSON.stringify({ error: `Groq error (${response.status})` }), {
         status: response.status, headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
