@@ -5,16 +5,16 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
 };
 
-const GEMINI_MODEL = Deno.env.get("GEMINI_MODEL") || "gemini-2.5-flash";
-const GEMINI_ENDPOINT = "https://generativelanguage.googleapis.com/v1beta/openai/chat/completions";
+const GROQ_MODEL = Deno.env.get("GROQ_MODEL") || "llama-3.3-70b-versatile";
+const GROQ_ENDPOINT = "https://api.groq.com/openai/v1/chat/completions";
 
 serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
 
   try {
     const { action, text, sourceLang, targetLang, recipient, tone, emailLang, meetingTitle, minutesLang, resumeType, targetIndustry, resumeLang } = await req.json();
-    const GEMINI_API_KEY = Deno.env.get("GEMINI_API_KEY");
-    if (!GEMINI_API_KEY) throw new Error("GEMINI_API_KEY is not configured");
+    const GROQ_API_KEY = Deno.env.get("GROQ_API_KEY");
+    if (!GROQ_API_KEY) throw new Error("GROQ_API_KEY is not configured");
 
     let systemPrompt = "";
     let userPrompt = text || "";
@@ -146,14 +146,14 @@ ${resumeLang === 'ja' ? `
         throw new Error(`Unknown action: ${action}`);
     }
 
-    const response = await fetch(GEMINI_ENDPOINT, {
+    const response = await fetch(GROQ_ENDPOINT, {
       method: "POST",
       headers: {
-        Authorization: `Bearer ${GEMINI_API_KEY}`,
+        Authorization: `Bearer ${GROQ_API_KEY}`,
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        model: GEMINI_MODEL,
+        model: GROQ_MODEL,
         messages: [
           { role: "system", content: systemPrompt },
           { role: "user", content: userPrompt },
@@ -168,8 +168,8 @@ ${resumeLang === 'ja' ? `
         });
       }
       const t = await response.text();
-      console.error("Gemini error:", response.status, t);
-      return new Response(JSON.stringify({ error: `Gemini error (${response.status})` }), {
+      console.error("Groq error:", response.status, t);
+      return new Response(JSON.stringify({ error: `Groq error (${response.status})` }), {
         status: response.status, headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
