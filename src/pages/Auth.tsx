@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Globe, Loader2, AlertTriangle, Monitor, Cloud, ArrowRight } from 'lucide-react';
+import { Globe, Loader2, AlertTriangle, Monitor, Cloud, ArrowRight, Eye, EyeOff, Check, X } from 'lucide-react';
 import { toast } from 'sonner';
 import { AppRole } from '@/contexts/OrgContext';
 import { signInSchema, signUpSchema } from '@/lib/validations';
@@ -14,7 +14,7 @@ import { handleApiError } from '@/lib/api-error';
 import { checkRateLimit } from '@/lib/rate-limit';
 import { MOCK_USERS } from '@/lib/mock-auth';
 import AuthShowcase from '@/components/auth/AuthShowcase';
-import { lovable } from '@/integrations/lovable';
+import { supabase } from '@/integrations/supabase/client';
 
 const Auth = () => {
   const { isAuthenticated, loading, signIn, signUp, mockSignIn, authMode, setAuthMode, supabaseAvailable } = useAuth();
@@ -22,9 +22,11 @@ const Auth = () => {
   const [isLogin, setIsLogin] = useState(true);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
   const [displayName, setDisplayName] = useState('');
   const [selectedRole, setSelectedRole] = useState<AppRole>('member');
   const [submitting, setSubmitting] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
 
   if (loading) {
@@ -55,7 +57,7 @@ const Auth = () => {
         return;
       }
     } else {
-      const result = signUpSchema.safeParse({ email, password, displayName, selectedRole });
+      const result = signUpSchema.safeParse({ email, password, confirmPassword, displayName, selectedRole });
       if (!result.success) {
         const errors: Record<string, string> = {};
         result.error.issues.forEach(issue => { errors[issue.path[0] as string] = issue.message; });
@@ -72,7 +74,7 @@ const Auth = () => {
       } else {
         const { error } = await signUp(email, password, displayName, selectedRole);
         if (error) handleApiError(error);
-        else toast.success(t('checkEmail'));
+        else toast.success(t('signup'));
       }
     } catch (err) {
       handleApiError(err);
@@ -84,14 +86,15 @@ const Auth = () => {
   const handleGoogleSignIn = async () => {
     setSubmitting(true);
     try {
-      const result = await lovable.auth.signInWithOAuth('google', {
-        redirect_uri: window.location.origin,
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: 'google',
+        options: { redirectTo: window.location.origin },
       });
-      if (result.error) {
-        handleApiError(result.error);
+      if (error) {
+        handleApiError(error);
         setSubmitting(false);
       }
-      // If redirected, browser navigates away.
+      // On success the browser is redirected to Google.
     } catch (err) {
       handleApiError(err);
       setSubmitting(false);
@@ -224,9 +227,43 @@ const Auth = () => {
                 </div>
                 <div className="space-y-1.5">
                   <Label htmlFor="password" className="text-xs font-medium text-muted-foreground">{t('password')}</Label>
-                  <Input id="password" type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="••••••••" required minLength={6} className="h-11 rounded-xl border-border/60 bg-card focus:border-primary" />
+                  <div className="relative">
+                    <Input id="password" type={showPassword ? 'text' : 'password'} value={password} onChange={(e) => setPassword(e.target.value)} placeholder="••••••••" required minLength={isLogin ? 6 : 8} className="h-11 rounded-xl border-border/60 bg-card focus:border-primary pr-10" />
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword((s) => !s)}
+                      aria-label={showPassword ? 'Hide password' : 'Show password'}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+                    >
+                      {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                    </button>
+                  </div>
                   {fieldErrors.password && <p className="text-xs text-destructive">{fieldErrors.password}</p>}
+                  {!isLogin && password.length > 0 && (
+                    <ul className="grid grid-cols-2 gap-x-3 gap-y-1 pt-1">
+                      {[
+                        { ok: password.length >= 8, label: '8+ characters' },
+                        { ok: /[A-Z]/.test(password), label: 'Uppercase' },
+                        { ok: /[a-z]/.test(password), label: 'Lowercase' },
+                        { ok: /[0-9]/.test(password), label: 'Number' },
+                      ].map((r) => (
+                        <li key={r.label} className={`flex items-center gap-1.5 text-[11px] ${r.ok ? 'text-success' : 'text-muted-foreground'}`}>
+                          {r.ok ? <Check className="h-3 w-3" /> : <X className="h-3 w-3" />}
+                          {r.label}
+                        </li>
+                      ))}
+                    </ul>
+                  )}
                 </div>
+                {!isLogin && (
+                  <div className="space-y-1.5">
+                    <Label htmlFor="confirmPassword" className="text-xs font-medium text-muted-foreground">Confirm password</Label>
+                    <div className="relative">
+                      <Input id="confirmPassword" type={showPassword ? 'text' : 'password'} value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} placeholder="••••••••" required className="h-11 rounded-xl border-border/60 bg-card focus:border-primary pr-10" />
+                    </div>
+                    {fieldErrors.confirmPassword && <p className="text-xs text-destructive">{fieldErrors.confirmPassword}</p>}
+                  </div>
+                )}
                 <Button type="submit" className="w-full h-11 rounded-xl font-medium text-sm" disabled={submitting}>
                   {submitting ? <><Loader2 className="mr-2 h-4 w-4 animate-spin" />{isLogin ? t('login') : t('signup')}</> : (
                     <span className="flex items-center gap-2">
@@ -274,7 +311,7 @@ const Auth = () => {
                 )}
                 <div className="text-xs">
                   {isLogin ? t('noAccount') : t('hasAccount')}{' '}
-                  <button onClick={() => { setIsLogin(!isLogin); setFieldErrors({}); }} className="font-medium text-primary hover:underline">
+                  <button onClick={() => { setIsLogin(!isLogin); setFieldErrors({}); setConfirmPassword(''); }} className="font-medium text-primary hover:underline">
                     {isLogin ? t('signup') : t('login')}
                   </button>
                 </div>
