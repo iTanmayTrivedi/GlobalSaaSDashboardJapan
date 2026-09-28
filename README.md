@@ -13,10 +13,9 @@
 
 <br/>
 
-<a href="https://your-url.com"><img alt="Live Demo" src="https://img.shields.io/badge/🌐_Live_Demo-0F172A?style=for-the-badge&logoColor=white"/></a>
-<a href="https://youtube.com/your-video"><img alt="Demo Video" src="https://img.shields.io/badge/🎬_Demo_Video-0F172A?style=for-the-badge"/></a>
+<a href="https://globaldashboard.tanmaytrivedi.dev"><img alt="Live Demo" src="https://img.shields.io/badge/🌐_Live_Demo-0F172A?style=for-the-badge&logoColor=white"/></a>
 <a href="https://tanmaytrivedi.dev/projects/kaizen"><img alt="Case Study" src="https://img.shields.io/badge/📖_Case_Study-0F172A?style=for-the-badge"/></a>
-<a href="https://linkedin.com/in/tanmaytrivedi"><img alt="LinkedIn" src="https://img.shields.io/badge/💼_LinkedIn-0F172A?style=for-the-badge"/></a>
+<a href="https://linkedin.com/in/itanmaytrivedi"><img alt="LinkedIn" src="https://img.shields.io/badge/💼_LinkedIn-0F172A?style=for-the-badge"/></a>
 
 <br/><br/>
 
