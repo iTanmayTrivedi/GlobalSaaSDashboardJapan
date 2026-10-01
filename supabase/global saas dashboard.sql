@@ -200,5 +200,5 @@ create policy "Authenticated can insert audit logs" on public.audit_logs
 -- 1. Enable Email auth (Authentication > Providers > Email)
 -- 2. (Optional) Enable Google OAuth
 -- 3. Deploy edge functions: supabase functions deploy ai-chat ai-tools seed-demo-user
--- 4. Set edge function secret: supabase secrets set LOVABLE_API_KEY=<gemini-or-lovable-key>
+-- 4. Set edge function secret: supabase secrets set GROQ_API_KEY=<your-key>
 -- ============================================================
