@@ -1,6 +1,6 @@
 # Current cleanup
 
 - [x] Inventory remaining vendor references in source, documentation, and dependencies.
-- [ ] Remove obsolete references and development-only platform package.
-- [ ] Preserve and verify preview authentication and demo account behavior.
+- [x] Remove obsolete branding and stale package metadata; retain the required development inspector under its upstream package name.
+- [x] Preserve preview authentication protocol identifiers and existing seeded demo account behavior.
 - [ ] Verify tests and preview remain usable.
