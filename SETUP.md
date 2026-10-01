@@ -2,10 +2,10 @@
 
 This project ships with two backends:
 
-- **Lovable Preview** → uses the hosted Lovable Cloud backend (`gourezuwwyfebtiaugpu`). **Do not change the `.env` in this repo / Lovable editor.**
+- **Hosted preview** → uses its configured backend. Do not change its environment settings when configuring a local clone.
 - **Your local Mac** → uses *your* personal Supabase project (`drzmcrrbpmsntartowjk`) via a local `.env` you create after cloning.
 
-Because `.env` is gitignored, your local file never affects the Lovable preview.
+Because `.env` is gitignored, your local file never affects the hosted preview.
 
 ---
 
@@ -42,8 +42,8 @@ VITE_SUPABASE_URL="https://drzmcrrbpmsntartowjk.supabase.co"
 In your Supabase dashboard → **Authentication**:
 
 - **Providers → Email**: enable. For local dev you can also enable *Auto-confirm email* so you don't need to click the verification link.
-- **Providers → Google** (optional): enable, paste your Google OAuth client ID & secret, and add `http://localhost:5173` + your prod URL to **URL Configuration → Redirect URLs**.
-- **URL Configuration → Site URL**: `http://localhost:5173`
+- **Providers → Google** (optional): enable, paste your Google OAuth client ID & secret, and add `http://localhost:8080` + your prod URL to **URL Configuration → Redirect URLs**.
+- **URL Configuration → Site URL**: `http://localhost:8080`
 
 ## 5. Deploy Edge Functions (for AI features)
 
@@ -56,13 +56,10 @@ supabase link --project-ref drzmcrrbpmsntartowjk
 supabase functions deploy ai-chat ai-tools seed-demo-user
 ```
 
-Then set the AI API key as a secret. The functions currently call `https://ai.gateway.lovable.dev` using a `LOVABLE_API_KEY`. On your own Supabase you have two options:
-
-- **Easiest:** keep using the Lovable AI Gateway — set `LOVABLE_API_KEY` to your own Lovable workspace API key.
-- **Fully independent:** get a free [Google AI Studio](https://aistudio.google.com/apikey) Gemini key, then rewrite `ai-chat/index.ts` and `ai-tools/index.ts` to call `https://generativelanguage.googleapis.com/...` directly. (I can do this rewrite for you in a follow-up.)
+The AI functions call Groq directly. Set your Groq API key as an Edge Function secret in your own Supabase project (never put it in the frontend `.env`):
 
 ```bash
-supabase secrets set LOVABLE_API_KEY=<your-key>
+supabase secrets set GROQ_API_KEY=<your-key>
 ```
 
 ## 6. Run it
@@ -71,7 +68,7 @@ supabase secrets set LOVABLE_API_KEY=<your-key>
 npm run dev
 ```
 
-Open http://localhost:5173. Sign up → it auto-creates a `profiles` row via the trigger → click **Create Organization** to bootstrap your tenant.
+Open http://localhost:8080. Sign up → it auto-creates a `profiles` row via the trigger → click **Create Organization** to bootstrap your tenant.
 
 ---
 
@@ -87,6 +84,6 @@ Open http://localhost:5173. Sign up → it auto-creates a `profiles` row via the
 |---|---|
 | `permission denied for table organizations` | You skipped the GRANT statements in `global saas dashboard.sql`. Re-run the whole file. |
 | Sign-up works but no profile created | The `on_auth_user_created` trigger didn't install. Re-run section *Triggers* of `global saas dashboard.sql`. |
-| AI tools return 500 | `LOVABLE_API_KEY` secret not set, or edge functions not deployed. |
+| AI tools return 500 | `GROQ_API_KEY` secret not set, or edge functions not deployed. |
 | Google login error `Unsupported provider` | Google provider not enabled in Supabase Auth → Providers. |
 | `Invalid login credentials` immediately after signup | Email confirmation required — enable *Auto-confirm* or click the email link. |
