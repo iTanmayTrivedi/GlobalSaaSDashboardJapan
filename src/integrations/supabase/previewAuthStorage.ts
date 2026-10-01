@@ -5,8 +5,8 @@
 export function brokeredPreviewStorage() {
   if (typeof window === 'undefined') return undefined;
   const host = location.hostname;
-  const PREVIEW_ZONES = ['lovableproject.com', 'lovableproject-dev.com', 'lovable.app', 'gpt-eng.com', 'gptengineer.run'];
-  const onPreviewZone = PREVIEW_ZONES.some((z) => host === z || host.endsWith('.' + z));
+  const TRUSTED_PREVIEW_DOMAINS = ['lovableproject.com', 'lovableproject-dev.com', 'lovable.app', 'gpt-eng.com', 'gptengineer.run'];
+  const onPreviewZone = TRUSTED_PREVIEW_DOMAINS.some((z) => host === z || host.endsWith('.' + z));
   // Read the id only from non-user-controlled host positions, so a user-named
   // preview--<name> host can't smuggle another project's id.
   const UUID = '[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}';
@@ -20,14 +20,14 @@ export function brokeredPreviewStorage() {
   // Post only to the real editor ancestor, validated as a trusted origin, so the
   // session token can never reach an untrusted embedder.
   const dev = host.endsWith('.lovableproject-dev.com') || host.endsWith('.gpt-eng.com');
-  const EDITOR = dev
+  const EDITOR_ORIGIN_PATTERN = dev
     ? /^https:\/\/([a-z0-9-]+\.)*(lovable\.dev|gptengineer\.app)$|^http:\/\/localhost:3000$/
     : /^https:\/\/([a-z0-9-]+\.)*(lovable\.dev|gptengineer\.app)$/;
   const ancestor = (location.ancestorOrigins && location.ancestorOrigins[0]) || (document.referrer ? new URL(document.referrer).origin : '');
-  const editorOrigins = ancestor && EDITOR.test(ancestor)
+  const editorOrigins = ancestor && EDITOR_ORIGIN_PATTERN.test(ancestor)
     ? [ancestor]
     : (dev ? ['https://lovable.dev', 'http://localhost:3000'] : ['https://lovable.dev']);
-  const RESULT = 'lovable-preview-auth:result';
+  const REPLY_TYPE = 'lovable-preview-auth:result';
   const TIMEOUT = 2000;
   const newId = () => Math.random().toString(36).slice(2) + Date.now().toString(36);
 
@@ -46,7 +46,7 @@ export function brokeredPreviewStorage() {
       const onMessage = (e: MessageEvent) => {
         if (editorOrigins.indexOf(e.origin) < 0) return;
         const d = e.data;
-        if (d && d.type === RESULT && d.requestId === requestId) finish(d);
+        if (d && d.type === REPLY_TYPE && d.requestId === requestId) finish(d);
       };
       window.addEventListener('message', onMessage);
       const msg: Record<string, unknown> = { type, requestId, projectId, key };
